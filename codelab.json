@@ -1,0 +1,24 @@
+{
+  "environment": "web",
+  "format": "html",
+  "prefix": "https://storage.googleapis.com",
+  "mainga": "UA-49880327-14",
+  "updated": "2020-07-24T23:01:18-04:00",
+  "id": "codelab6_cloudfunctions",
+  "duration": 2,
+  "title": "GDG Lawrence Full Stack Community / Firebase Backend using Cloud Functions for Firebase",
+  "authors": "Roman Jaquez",
+  "summary": "GDG Community Project Backend using Cloud Functions",
+  "source": "./gdgfullstack_labs/codelabs-6-bonus1.md",
+  "theme": "",
+  "status": [
+    "published"
+  ],
+  "category": [
+    "meta"
+  ],
+  "tags": [
+    "beginner"
+  ],
+  "url": "codelab6_cloudfunctions"
+}

@@ -1,0 +1,358 @@
+
+<!doctype html>
+
+<html>
+<head>
+  <meta name="viewport" content="width=device-width, minimum-scale=1.0, initial-scale=1.0, user-scalable=yes">
+  <meta name="theme-color" content="#4F7DC9">
+  <meta charset="UTF-8">
+  <title>GDG Lawrence Full Stack Community / Firebase Backend using Cloud Functions for Firebase</title>
+  <link rel="stylesheet" href="//fonts.googleapis.com/css?family=Source+Code+Pro:400|Roboto:400,300,400italic,500,700|Roboto+Mono">
+  <link rel="stylesheet" href="//fonts.googleapis.com/icon?family=Material+Icons">
+  <link rel="stylesheet" href="https://storage.googleapis.com/codelab-elements/codelab-elements.css">
+  <style>
+    .success {
+      color: #1e8e3e;
+    }
+    .error {
+      color: red;
+    }
+  </style>
+</head>
+<body>
+  <google-codelab-analytics gaid="UA-49880327-14"></google-codelab-analytics>
+  <google-codelab codelab-gaid=""
+                  id="codelab6_cloudfunctions"
+                  title="GDG Lawrence Full Stack Community / Firebase Backend using Cloud Functions for Firebase"
+                  environment="web"
+                  feedback-link="">
+    
+      <google-codelab-step label="Overview" duration="2">
+        <p>This codelab provides the tutorial on how to create a backend for the GDG Community project using Cloud Functions for Firebase.</p>
+<h2 is-upgraded>What you will learn</h2>
+<ul>
+<li>How to use Cloud Functions for Firebase</li>
+<li>Create RESTful APIs using Cloud Functions for Firebase</li>
+<li>Accessing Cloud Firestore data from Cloud Functions</li>
+<li>Access Cloud Functions from an Angular Project</li>
+</ul>
+<h2 is-upgraded>Prerequisites</h2>
+<ul>
+<li>Full Stack Development Environment Setup</li>
+<li>Firebase Console Account</li>
+<li>Internet Connection</li>
+<li>Having completed the GDG Community Project (labs 1 - 5).</li>
+</ul>
+<p>You&#39;ll be able create your own APIs all hosted securely in the Google Cloud, and managed via your Firebase Console. You will leverage the power of Node.JS and Express under the hood through Cloud Functions for Firebase and how to access your data already stored in Cloud Firestore through these versatile serverless approach.</p>
+
+
+      </google-codelab-step>
+    
+      <google-codelab-step label="Prerequisite Review: Install the Firebase CLI" duration="0">
+        <p>Make sure you are able to run firebase commands by confirming that  you have the Firebase CLI installed on your machine.</p>
+<pre><code>firebase --version
+</code></pre>
+<p>As of this writing, the latest version of Firebase is 8.5.0. If  you haven&#39;t installed it, do the following:</p>
+<pre><code>npm install -g firebase-tools
+</code></pre>
+
+
+      </google-codelab-step>
+    
+      <google-codelab-step label="Log in to your Firebase environment via the Firebase CLI" duration="0">
+        <p>Firebase CLI needs you to be authorized in order to perform some actions on your behalf: deploy files, set configuration files, execute code, etc.</p>
+<p>Let&#39;s create a separate folder, outside of the GDG Community Project. Let&#39;s call it <strong>gdgcommunity-backend</strong>.</p>
+<p>Through a terminal or Visual Studio&#39;s command line, access the folder above, then at the root of that folder, execute the following command:</p>
+<pre><code>firebase login
+</code></pre>
+<p>You get the following prompt in the command line. Select NO on Allowing Firebase to collect CLI usage.</p>
+<pre><code>i  Firebase optionally collects CLI usage and error reporting information to help improve our products. Data is collected in accordance with Google&#39;s privacy policy (https://policies.google.com/privacy) and is not used to identify you.
+
+? Allow Firebase to collect CLI usage and error reporting information? No
+</code></pre>
+<p>Then you will notice that a browser window pops up, prompting you to select the account under which your Firebase project was created. Select the corresponding account.</p>
+<p class="image-container"><img alt="alt text" src="img/5f4d073c4b99e900.png"></p>
+<p>Then you&#39;re prompted to allow Firebase CLI to access your Google Account and authorize you.</p>
+<p class="image-container"><img alt="alt text" src="img/3d32e5a23a669ea2.png"></p>
+<p>Subsequently, you&#39;ll get a confirmation.</p>
+<p class="image-container"><img alt="alt text" src="img/cc18e9535164853b.png"></p>
+<pre><code>Waiting for authentication...
+
+✔  Success! Logged in as gdglawrence@gmail.com
+</code></pre>
+<p>After this, you can close the browser window and go back to the command line window.</p>
+
+
+      </google-codelab-step>
+    
+      <google-codelab-step label="Initializing the GDG Community Firebase Backend" duration="0">
+        <p>Inside a terminal or Visual Studio&#39;s command line, at the root of this folder, execute the following command:</p>
+<pre><code>firebase init
+</code></pre>
+<p>This will initialize your Firebase project. Immediately you notice some activity in the command line and you&#39;ll start receiving prompts.</p>
+<p>The first prompt asks what features  you want to set up from Firebase. You can select multiple, but for now we&#39;ll go with just Functions. Use the Space Bar to select, and Enter to confirm.</p>
+<pre><code>? Which Firebase CLI features do you want to set up for this folder? Press Space to select features, then Enter to confirm 
+your choices. 
+ ◯ Database: Deploy Firebase Realtime Database Rules
+ ◯ Firestore: Deploy rules and create indexes for Firestore
+❯◉ Functions: Configure and deploy Cloud Functions
+ ◯ Hosting: Configure and deploy Firebase Hosting sites
+ ◯ Storage: Deploy Cloud Storage security rules
+ ◯ Emulators: Set up local emulators for Firebase features
+</code></pre>
+<p>Next you get the prompt for the Functions Setup. Select <strong>Typescript</strong>.</p>
+<pre><code>=== Functions Setup
+
+A functions directory will be created in your project with a Node.js
+package pre-configured. Functions can be deployed with firebase deploy.
+
+? What language would you like to use to write Cloud Functions? 
+  JavaScript 
+❯ TypeScript 
+</code></pre>
+<p>Next, it asks about TSLint. Let&#39;s say No (n) for now:</p>
+<pre><code>? Do you want to use TSLint to catch probable bugs and enforce style? (Y/n) n
+
+✔  Wrote functions/package.json
+✔  Wrote functions/tsconfig.json
+✔  Wrote functions/src/index.ts
+✔  Wrote functions/.gitignore
+
+</code></pre>
+<p>Next, mark Yes (Y) on installing NPM dependencies:</p>
+<pre><code>? Do you want to install dependencies with npm now? (Y/n) Y
+
+i  Writing configuration info to firebase.json...
+i  Writing project information to .firebaserc...
+i  Writing gitignore file to .gitignore...
+
+</code></pre>
+<p>After that, your Firebase project should be initialized:</p>
+<pre><code>✔  Firebase initialization complete!
+</code></pre>
+<h2 is-upgraded>Project Structure</h2>
+<p>In Visual Studio, after you initialize the project, you end up with a project structure like the following:</p>
+<p class="image-container"><img alt="alt text" src="img/a0aa865bcade9537.png"></p>
+<p>You can inspect the files at your leisure, but we will only be working mainly on the <em>index.ts</em> file located inside the <strong>functions/src</strong> folder.</p>
+<p>Let&#39;s inspect this file. Notice we are importing the <strong>firebase-functions</strong> package and importing everything into an alias called <strong>functions</strong>.</p>
+<p>Proceed to uncomment the rest of the code, where here we are defining a function called <strong>helloWorld</strong>. Notice how we are using the <strong>https</strong> API from the <strong>functions</strong> package, which has a hook method called <strong>onRequest</strong> which allows to attach a callback method. The <strong>onRequest</strong> hook method allows you to invoke your callback method as a reponse to an HTTP request to a RESTful API method called <strong>helloWorld</strong>.</p>
+<pre><code>export const helloWorld = functions.https.onRequest((request, response) =&gt; {
+    response.send(&#34;Hello from Firebase&#34;);
+});
+</code></pre>
+<p>Notice we are tapping into the <strong>reponse</strong> parameter provided via the callback method. The <strong>request</strong> and <strong>response</strong> parameters are into the <em>Express</em> framework, a popular framework for building RESTful APIs using Node.JS. More info on Express <a href="https://expressjs.com/" target="_blank">here</a>.</p>
+<p>Every method maps to a function. You can have more than one method within the same file, but it is advised to have a method per file. In our case, the method is called <strong>helloWorld</strong> and we export it (<strong>export const helloWorld</strong>), which will make it available as a separate Cloud Function.</p>
+
+
+      </google-codelab-step>
+    
+      <google-codelab-step label="Deploying your newly created Cloud Function" duration="0">
+        <p>Now that you&#39;ve uncommented the code and have dissected the function (although it&#39;s a very simple case) you can use this method and deploy it in order to test it out.</p>
+<p>On the command line, execute the following command:</p>
+<pre><code>firebase deploy
+</code></pre>
+<p>This will trigger the deployment process of your function up to your Firebase project in Firebase Console.</p>
+<p><strong>NOTE: IN ORDER TO DEPLOY FUNCTIONS INTO FIREBASE, YOU MUST UPGRADE YOUR ACCOUNT FROM FREE (SPARK) TO PAY-AS-YOU-GO (BLAZE) OR DEPLOYMENTS WILL FAIL.</strong></p>
+<p>Once deployment succeeds, you can invoke your newly deployed function. The syntax of your RESTful API method will be: <em>https://us-central1-</em>.cloudfunctions.net/helloWorld when you invoke it.</p>
+<p>Once the invocation succeeds, you will get as a response the string <strong>&#34;Hello World&#34;</strong>, whether you invoke it via the browser, or perform a <strong>curl</strong> on this URL.</p>
+<p class="image-container"><img alt="alt text" src="img/4e31349877936def.png"></p>
+
+
+      </google-codelab-step>
+    
+      <google-codelab-step label="Monitor your Firebase Function in the Firebase Console" duration="0">
+        <p>Navigate to your Firebase Console portal. On the left hand navigation of the portal, find the <strong>Functions</strong> navigation item; click on it. On the right hand side, you will see the <strong>Functions</strong> page. Select the <strong>Dashboard</strong> tab, and you will notice that your deploy function is there. Also notice under the <strong>Trigger</strong> function it specifies what the trigger of this function is; in our case, it is an HTTP Request, since we tapped into the <strong>functions.https</strong> API of the Firebase Functions.</p>
+<p class="image-container"><img alt="alt text" src="img/8e06ea50e10a0a83.png"></p>
+
+
+      </google-codelab-step>
+    
+      <google-codelab-step label="Customize your Cloud Function" duration="0">
+        <p>Now that we know how to create a simple Cloud Function, how to deploy it and how to invoke it, let&#39;s repurpose it for our needs. We need an RESTful API function that by us sending the authenticated user id, it can find us in the Cloud Firestore, and change the <strong>isOnline</strong> status to whatever we want to set it to (true or false).</p>
+<p>Let&#39;s navigate again to the <strong>functions/src/index.ts</strong> file and copy / paste the code below:</p>
+<pre><code>const functions = require(&#39;firebase-functions&#39;);
+const admin = require(&#39;firebase-admin&#39;);
+admin.initializeApp();
+const db = admin.firestore();
+
+exports.setOnlineStatus = functions.https.onRequest((request: any, response: any) =&gt; {
+ 
+    if (request.body.uid) {
+        db.collection(&#39;community&#39;).doc(request.body.uid).set({
+            isOnline: request.body.isOnline
+        }, { merge: true }).then(() =&gt; {
+            response.status(200).json({
+                success: true
+            });
+        }).catch(() =&gt; {
+            response.status(500).json({
+                success: false
+            });
+        })
+    }
+    else {
+        response.status(404).json({
+            success: false
+        });
+    }
+});
+</code></pre>
+<p>Let&#39;s dissect it.</p>
+<p>We rewrote how we are importing the dependencies to be more inline with how Firebase recommends it. Either way would work but we want to be consistent. We import the <strong>firebase-functions</strong> and <strong>firebase-admin</strong>. The <strong>firebase-functions</strong> will give us access to the APIs to provide the hooks to tap into the Firebase triggers (HTTP, Firebase, Cloud Storage triggers, etc.).</p>
+<p>The <strong>firebase-admin</strong> allows us to tap into admin functionality from inside Firebase once the function is deployed, that way we can access configuration, backend functionality, databases, etc.</p>
+<pre><code>const functions = require(&#39;firebase-functions&#39;);
+const admin = require(&#39;firebase-admin&#39;);
+</code></pre>
+<p>Through the <strong>admin</strong> package reference, call the <em>initializeApp()</em>.</p>
+<pre><code>admin.initializeApp();
+</code></pre>
+<p>Then, obtain a reference to the Cloud Firestore through it, and store it in a constant called <strong>db</strong>:</p>
+<pre><code>const db  = admin.firestore();
+</code></pre>
+<p>Using the <em>exports</em> syntax, attach a property to it called <strong>setOnlineStatus</strong> and to this property, assign a reference to the <strong>functions.https.onRequest</strong> HTTP Request hook and pass a callback to it. Notice we are receiving two parameters (request and response) which are the same parameters received when we create an Express.js RESTful API method - the HTTP Request hook triggers use Express underneath the covers:</p>
+<pre><code>exports.setOnlineStatus = functions.https.onRequest((request: any, response: any) =&gt; {
+    ...
+}
+</code></pre>
+<p>Inside of the method, we are checking whether the user has provided the property <strong>uid</strong> inside the BODY when performing a POST against this Cloud Function, otherwise return a <strong>404 (Not Found)</strong> status code back to the user, and a simple JSON stating that the call was unsuccessful:</p>
+<pre><code>...
+if (request.body.uid) {
+    ...
+}
+else {
+    response.status(404).json({
+        success: false
+    });
+}
+</code></pre>
+<h2 is-upgraded>Accessing Firestore inside your Cloud Function</h2>
+<p>After we&#39;ve validated the user provided a UID, we proceed to access a specific collection from Cloud Firestore, and query the document that matches the specified <em>uid</em>. On the matched document, I set a property called <strong>isOnline</strong> and I set it to whatever the user provided in an additional property called <strong>isOnline</strong>, and use the *<strong>{ merge: true }</strong> option to just update that property.</p>
+<p>If the transaction was successful, return a 200 HTTP status code with a simple JSON, otherwise return a 500 HTTP status to denote an error.</p>
+<pre><code>...
+db.collection(&#39;community&#39;).doc(request.body.uid).set({
+    isOnline: request.body.isOnline
+}, { merge: true }).then(() =&gt; {
+    response.status(200).json({
+        success: true
+    });
+}).catch(() =&gt; {
+    response.status(500).json({
+        success: false
+    });
+});
+...
+</code></pre>
+<h2 is-upgraded>Redeploy your Cloud Function</h2>
+<p>Once all the changes are in place, execute the following command:</p>
+<pre><code>firebase deploy
+</code></pre>
+<p>Now, in order to test your application, you must know the UID of the user so we can change their online status via this RESTful API endpoint. You can go to the Cloud Firestore database, grab one of the UIDs from the <strong>community</strong> collection and perform the RESTful API call (via Postman, for example, or any other similar tool) and perform the call as shown below:</p>
+<p class="image-container"><img alt="alt text" src="img/b30010df7dfdd9be.png"></p>
+<p>You should be able to receive the appropriate response whether it succeeds or not.</p>
+<p>However, if you try to invoke this function from your Angular app, you will get a cross-origin error, because by default, Firebase-based RESTful APIs do not allow applications outside of its domain to access them, hence protecting them by throwing a CORS error. More on CORS <a href="https://developer.mozilla.org/en-US/docs/Web/HTTP/CORS" target="_blank">here</a>.</p>
+<p>Let&#39;s fix that CORS issue in the following step.</p>
+
+
+      </google-codelab-step>
+    
+      <google-codelab-step label="Enabling CORS on your Firebase Functions" duration="0">
+        <p><a href="https://developer.mozilla.org/en-US/docs/Web/HTTP/CORS" target="_blank">CORS</a> (Cross-Origin Resource Sharing) is a mechanism that uses additional HTTP headers to tell browsers to give a web application running at one origin, access to selected resources from a different origin. A web application executes a cross-origin HTTP request when it requests a resource that has a different origin (domain, protocol, or port) from its own.</p>
+<p>In our case, our web app is running on <em>localhost:4200</em> while our Firebase RESTful API is running somewhere on the Google Cloud. We need to allow ANY application (for now) to access our API, thus making it open for anyone to perform HTTP GET or POST requests.</p>
+<p>Let&#39;s go back to our Firebase <em>setOnlineStatus</em> function, and at the top of the <strong>index.ts</strong> file, let&#39;s add an additional import: the <strong>cors</strong> package, in order to enable our APIs to allow apps on other domains / ports to access them.</p>
+<pre><code>const cors = require(&#39;cors&#39;)({ origin: true });
+</code></pre>
+<p>We use the <em>origin: true</em> option to reflect the request origin (meaning any requesting domain origin will be allowed), otherwise <em>false</em> will disable CORS and block incoming request from other domains.</p>
+<p>Now, inside the <em>setOnlineStatus</em> function, you will wrap the whole content of the function inside a <strong>cors()</strong> method call, taking three parameters: the <strong>request</strong>, the <strong>response</strong> and a callback that will contain all code that will execute once it validates the incoming request. Your code should look like this:</p>
+<pre><code>exports.setOnlineStatus = functions.https.onRequest((request: any, response: any) =&gt; {
+
+    /// wrap the whole code inside a cors() call
+    cors(request, response, () =&gt; {
+        if (request.body.uid) {
+            db.collection(&#39;community&#39;).doc(request.body.uid).set({
+                isOnline: request.body.isOnline
+            }, { merge: true }).then(() =&gt; {
+                response.status(200).json({
+                    success: true
+                });
+            }).catch(() =&gt; {
+                response.status(500).json({
+                    success: false
+                });
+            })
+        }
+        else {
+            response.status(404).json({
+                success: false
+            });
+        }
+    }); // end of CORS wrap method
+});
+</code></pre>
+<p>Simple as that! Redeploy your application with the command</p>
+<pre><code>firebase deploy
+</code></pre>
+<p>and you should be good to go. Let&#39;s proceed by invoking this function from our Angular app.</p>
+
+
+      </google-codelab-step>
+    
+      <google-codelab-step label="Invoking the Cloud Function from the GDG Community Angular Project" duration="0">
+        <p>Everything is up and running in the backend, but we haven&#39;t leveraged this in the front end. Let&#39;s go back to the GDG Community Angular Project.</p>
+<p>Navigate to the <em>app.module.ts</em>. Since we will be making an HTTP call to our RESTful API endpoint in Firebase, we need in import the HttpClientModule in this file. Add the following line at the top, with the rest of the imports:</p>
+<pre><code>import { HttpClientModule } from &#39;@angular/common/http&#39;;
+</code></pre>
+<p>In the <strong>imports</strong> section, add the newly imported module.</p>
+<pre><code>...
+imports: [
+    ...
+    HttpClientModule
+]
+</code></pre>
+<p>Find the <em>UserService</em> service (under <strong>user.service.ts</strong> file). Add the HttpClient import at the top of this file:</p>
+<pre><code>...
+import { HttpClient } from &#39;@angular/common/http&#39;;
+...
+</code></pre>
+<p>Inject it in the constructor:</p>
+<pre><code>...
+constructor(
+    private firestore: AngularFirestore,
+    private http: HttpClient
+  ) { }
+...
+</code></pre>
+<p>Find the method called <strong>setUserOnlineStatus</strong>, and comment out the code that directly access the Firestore Collection, and add the following code instead:</p>
+<pre><code>setUserOnlineStatus(userId: string, isUserOnline: boolean) {
+    return new Promise&lt;boolean&gt;((resolve, reject) =&gt; {
+      // this.firestore.collection(&#39;community&#39;).doc(userId).set({
+      //   isOnline: isUserOnline
+      // }, { merge: true }).then(() =&gt; {
+      //   resolve(true);
+      // });
+      this.http.post(&#39;https://us-central1-fullstack-labs.cloudfunctions.net/setOnlineStatus&#39;,
+      { uid: userId, isOnline: isUserOnline }).toPromise().then((response: any) =&gt; {
+        resolve(true);
+      }).catch((error) =&gt; {
+        reject(error);
+      });
+    });
+  }
+</code></pre>
+<p>Notice we&#39;ve commented out the code to set the document directly into firestore, and instead we&#39;ve added an HTTP POST call to the Firebase function we created earlier, which performs the same action as before, but on our behalf, and executing it on the backend. This approach will isolate and decouple the need for apps to have a Firebase dependency (for those apps that may not have Firebase support but can actually perform an HTTP request call).</p>
+<p>And voilá! The same thing we used to do before - marking the user&#39;s online status - can occur via a Firebase function this time around.</p>
+<p class="image-container"><img alt="alt text" src="img/c22f5d5cb44c022b.png"></p>
+<p>Now you&#39;re ready to implement your own Firebase Cloud Functions and create  your own RESTful APIs by leveraging Node.JS and Express inside Firebase!</p>
+
+
+      </google-codelab-step>
+    
+  </google-codelab>
+
+  <script src="https://storage.googleapis.com/codelab-elements/native-shim.js"></script>
+  <script src="https://storage.googleapis.com/codelab-elements/custom-elements.min.js"></script>
+  <script src="https://storage.googleapis.com/codelab-elements/prettify.js"></script>
+  <script src="https://storage.googleapis.com/codelab-elements/codelab-elements.js"></script>
+  <script src="//support.google.com/inapp/api.js"></script>
+
+</body>
+</html>
